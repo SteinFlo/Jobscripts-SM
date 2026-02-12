@@ -1,6 +1,6 @@
 #!/bin/bash
 
-container='singularity exec --fusemount "container:sshfs godot3:/localdisk/.fstein /data/fstein/mnt" --bind /data/fstein:/data/fstein /data/fstein/builds/ITensor-julia-wo.sif'
+containercommand='singularity exec --fusemount "container:sshfs godot3:/localdisk/.fstein /data/fstein/mnt" --bind /data/fstein:/data/fstein /data/fstein/builds/ITensor-julia-wo.sif'
 TEscript="/data/fstein/drivers/run_SSBTE.jl"
 GSscript="/data/fstein/drivers/run_DMRG_GS.sh"
 
@@ -43,21 +43,37 @@ else
 
 
     echo "#!/bin/bash"                  >> $out 
-    echo "#SBATCH --partition=physics"   >> $out 
-    echo "#SBATCH --requeue"   >> $out 
+    echo "#SBATCH --partition=physics"  >> $out 
+    echo "#SBATCH --requeue"            >> $out 
     echo "#SBATCH -c ${cores}"          >> $out 
     echo "#SBATCH --mem ${mem}"         >> $out 
-
-    echo " " >> $out 
-    #echo container=\''singularity exec --fusemount "container:sshfs godot3:/localdisk/.fstein /data/fstein/mnt" --bind /data/fstein:/data/fstein /data/fstein/builds/ITensor-julia-wo.sif'\' >> $out
-    #echo 'GSscript="/data/fstein/drivers/run_DMRG_GS.sh"' >> $out
-    #echo 'TEscript="/data/fstein/drivers/run_FermiStrTE.jl"' >> $out
     echo " " >> $out 
 
-    echo -n "$container" $GSscript "$mg $l0 $x $N $dimsymb" >> $out
+    echo 'scratch=/scr/$SLURM_JOB_ID'   >> $out
+    echo 'mntpoint=$scratch/mnt'        >> $out
+    echo 'mkdir -p $mntpoint'           >> $out
+    echo " " >> $out 
+
+    echo 'driverGS=$scratch/driverGS'   >> $out
+    echo 'driverTE=$scratch/driverTE'   >> $out
+    echo 'container=$scratch/container' >> $out
+    echo " " >> $out 
+
+    echo "cp $GSscript"  '$driverGS'    >> $out
+    echo "cp $TEscript"  '$driverTE'    >> $out
+    echo 'cp /data/fstein/builds/ITensor-julia-wo.sif $container' >> $out
+    echo " " >> $out
+
+    echo -n "singularity exec \\
+             --fusemount \"container:sshfs godot3:/localdisk/.fstein" '$mntpoint'\" "\\
+             --bind" '$scratch':'$scratch' "\\
+            "'$container' '$driverGS' "$mg $l0 $x $N $dimsymb" '$mntpoint' >> $out
     for k in $(seq $k1 $kstep $k2); do
         echo " && \\" >> $out 
-        echo -n "$container" $TEscript "$N $d $truncation $x  $mg $l0 $N1 $N2 $dt $k $order $cutoff" >> $out
+        echo -n "singularity exec \\
+                 --fusemount \"container:sshfs godot3:/localdisk/.fstein" '$mntpoint'\" "\\
+                 --bind" '$scratch':'$scratch' "\\
+                "'$container' '$driverTE' "$N $d $truncation $x  $mg $l0 $N1 $N2 $dt $k $order $cutoff" '$mntpoint' >> $out
     done
     chmod +x $out
 fi
