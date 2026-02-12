@@ -1,6 +1,5 @@
 #!/bin/bash
 
-containercommand='singularity exec --fusemount "container:sshfs godot3:/localdisk/.fstein /data/fstein/mnt" --bind /data/fstein:/data/fstein /data/fstein/builds/ITensor-julia-wo.sif'
 TEscript="/data/fstein/drivers/run_SSBTE.jl"
 GSscript="/data/fstein/drivers/run_DMRG_GS.sh"
 
@@ -75,6 +74,8 @@ else
                  --bind" '$scratch':'$scratch' "\\
                 "'$container' '$driverTE' "$N $d $truncation $x  $mg $l0 $N1 $N2 $dt $k $order $cutoff" '$mntpoint' >> $out
     done
+
+    echo 'rm -rf $scratch' >> $out
     chmod +x $out
 fi
 
