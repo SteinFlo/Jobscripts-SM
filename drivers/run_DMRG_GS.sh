@@ -4,7 +4,8 @@ l=$2
 x=$3
 N=$4
 d=$5
-dir=$g
+dir=$6
+
 
 
 if [ "${d}" = "inf" ]; then 
