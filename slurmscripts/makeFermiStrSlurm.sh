@@ -37,7 +37,7 @@ else
 
     timestamp=$(date +%F_%T)
 
-    out="/data/fstein/slurmscripts/SSBStrTE/S-N${N}_d${dimsymb}_x${x}_mg${mg}_l0${l0}_N1-${N1}_N2-${N2}_dt${dt}_k${k1}-${kstep}-${k2}_ord${order}_cut${cutoff}_${timestamp}.sh"
+    out="/data/fstein/slurmscripts/FermiStrTE/F-N${N}_d${dimsymb}_x${x}_mg${mg}_l0${l0}_N1-${N1}_N2-${N2}_dt${dt}_k${k1}-${kstep}-${k2}_ord${order}_cut${cutoff}_${timestamp}.sh"
 
 
 
