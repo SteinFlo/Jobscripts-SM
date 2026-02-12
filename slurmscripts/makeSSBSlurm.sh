@@ -75,6 +75,8 @@ else
                 "'$container' '$driverTE' "$N $d $truncation $x  $mg $l0 $N1 $N2 $dt $k $order $cutoff" '$mntpoint' >> $out
     done
 
+    echo " " >> $out
+    echo " " >> $out
     echo 'rm -rf $scratch' >> $out
     chmod +x $out
 fi

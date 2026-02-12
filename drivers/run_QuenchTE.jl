@@ -1,6 +1,7 @@
 #!/opt/julia-1.12.3/bin/julia
 include("/nethome/fstein/repositories/schwingermodeltn/src/timeEvolution/SchwingerModelTNTE.jl")
 
+
 if length(ARGS) == 13
     N         = parse(Int64,   ARGS[1])
     dimension = parse(Int64,   ARGS[2])
@@ -49,4 +50,4 @@ if length(ARGS) == 13
 else
     println("Wrong number of arguments. Usage:")
         println("run_QuenchTE.jl N d truncation x m/g m/g' l0 l0' dt k  order cutoff basedir")
-    end
+end
