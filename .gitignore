@@ -1,0 +1,11 @@
+slurmscripts/FermiStrTE/*
+slurmscripts/Fij/*
+slurmscripts/Mij/*
+slurmscripts/Quench/*
+slurmscripts/SSBStrTE/*
+slurmscripts/queueall.sh
+slurmscripts/tests/*
+drivers/combined-TE/*
+jobscripts/
+builds/*
+*.swp
