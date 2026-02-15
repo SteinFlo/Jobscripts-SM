@@ -79,9 +79,9 @@ else
     echo " " >> $out
 
     echo 'tind=$(python3 -c "print('$begin + $step'*((${SLURM_ARRAY_TASK_ID}-1)//'$numpert'))")' >> $out
-    echo 'kind=$(python3 -c "print(${SLURM_ARRAY_TASK_ID}%'$numpert')")' >> $out
+    echo 'kind=$(python3 -c "print((${SLURM_ARRAY_TASK_ID}-1)%'$numpert')")' >> $out
     #echo 'ind=$(python3 -c "print(' '(${SLURM_ARRAY_TASK_ID} -1)' "* $numpert + 1)\")" >> $out 
-    echo 'ind=$(python3 -c "print($kind + $tind)")' >> $out 
+    echo 'ind=$(python3 -c "print(int($kind + ($tind-1)*'$numpert'))")' >> $out 
 
 
     echo "singularity exec \\
