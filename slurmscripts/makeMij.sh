@@ -40,15 +40,19 @@ else
     timestamp=$(date +%F_%T)
 
     dtstr="${dts// /}"
+    dtstr="${dtstr//\]/}"
+    dtstr="${dtstr//\[/}"
 
-    out="/data/fstein/slurmscripts/Mij/Mij-N${N}_d${dimsymb}_x${x}_mg${mg}_l0${l0}_dt${dt0}_${dtstr}_it${begin}-${step}-${end}_ord${order}_cut${cutoff}_${timestamp}.sh"
+    out="/data/fstein/slurmscripts/Mij/Mij-N${N}_d${dimsymb}_x${x}_mg${mg}_l0${l0}_dt${dt0}_${dtstr}_step${timestep}_it${begin}-${step}-${end}_ord${order}_cut${cutoff}_${timestamp}.sh"
     echo $out
 
     numk=$(echo $dts | awk -F, '{print NF}')
     numpert=$(python3 -c "print($numk**2  + $numk)")
-    minind=$(python3 -c "print($numpert*($begin-1)+1)")
-    stepind=$(python3 -c "print($numpert*($step-1))")
-    maxind=$(python3 -c "print($numpert*($end-1)+1)")
+    maxslurmind=$(python3 -c "print(int((($end-$begin)/$step+1)*$numpert))")
+
+    #minind=$(python3 -c "print($numpert*($begin-1)+1)")
+    #stepind=$(python3 -c "print($numpert*($step))")
+    #maxind=$(python3 -c "print($numpert*($end-1)+1)")
 
 
 
@@ -57,7 +61,9 @@ else
     echo "#SBATCH --requeue"   >> $out 
     echo "#SBATCH -c ${cores}"          >> $out 
     echo "#SBATCH --mem ${mem}"         >> $out 
-    echo "#SBATCH --array=${minind}-${maxind}:${stepind}"         >> $out 
+    #echo "#SBATCH --array=${minind}-${maxind}:${stepind}"         >> $out 
+    #echo "#SBATCH --array=${begin}-${end}:${step}"         >> $out 
+    echo "#SBATCH --array=1-${maxslurmind}"         >> $out 
 
     echo 'scratch=/scr/${SLURM_JOB_ID}_${SLURM_ARRAY_TASK_ID}'   >> $out
     echo 'mntpoint=$scratch/mnt'        >> $out
@@ -72,13 +78,16 @@ else
     echo 'cp /data/fstein/builds/ITensor-julia-wo.sif $container' >> $out
     echo " " >> $out
 
-
+    echo 'tind=$(python3 -c "print('$begin + $step'*((${SLURM_ARRAY_TASK_ID}-1)//'$numpert'))")' >> $out
+    echo 'kind=$(python3 -c "print(${SLURM_ARRAY_TASK_ID}%'$numpert')")' >> $out
+    #echo 'ind=$(python3 -c "print(' '(${SLURM_ARRAY_TASK_ID} -1)' "* $numpert + 1)\")" >> $out 
+    echo 'ind=$(python3 -c "print($kind + $tind)")' >> $out 
 
 
     echo "singularity exec \\
                  --fusemount \"container:sshfs godot3:/localdisk/.fstein" '$mntpoint'\" "\\
                  --bind" '$scratch':'$scratch' "\\
-                "'$container' '$driverMij' $N $d $truncation $x  $mg $l0 $dt0 \"$dts\" $timestep $order $cutoff '$mntpoint' '${SLURM_ARRAY_TASK_ID}' >> $out
+                "'$container' '$driverMij' $N $d $truncation $x  $mg $l0 $dt0 \"$dts\" $timestep $order $cutoff '$mntpoint' '${ind}' >> $out
 
     echo 'rm -rf $scratch' >> $out
 
