@@ -26,9 +26,12 @@ if length(ARGS) == 13
 
     numk = length(dts)
 
-
+    
     counter2 = mod(counter-1, numk^2+numk)+1
     counter_t = div(counter, numk^2+numk)+1
+    
+    #println(counter)
+    #println(counter2)
 
     t = timestep * counter_t
     k0 = Int(round(t/dt0))
@@ -42,7 +45,7 @@ if length(ARGS) == 13
 
     s = getSites(N, dimension)
 
-    if counter_t <= numk
+    if counter2 <= numk
         outputname = string(dirname, "out/Fij/", "N", N, "_d", dimension, truncstr, "_x", x, "_mg", mg, "_l0", l0, "_t", t, "_ki", k0, "_kj", ks[counter2], "_order", order, "_cutoff", cutoff, ".out")
         open(outputname, "w") do file
             redirect_stdout(file) do
@@ -53,6 +56,8 @@ if length(ARGS) == 13
         counter_p = counter2 - numk -1
         i = div(counter_p, numk)+1
         j = mod(counter_p, numk)+1
+        #println(counter_p, " ", numk)
+        #println("i,j", i, " ", j)
         if i!=j
             outputname = string(dirname, "out/Fij/", "N", N, "_d", dimension, truncstr, "_x", x, "_mg", mg, "_l0", l0, "_t", t, "_ki", ks[i], "_kj", ks[j], "_order", order, "_cutoff", cutoff, ".out")
             open(outputname, "w") do file

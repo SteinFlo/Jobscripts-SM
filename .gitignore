@@ -9,3 +9,4 @@ drivers/combined-TE/*
 jobscripts/
 builds/*
 *.swp
+*slurm*.out
