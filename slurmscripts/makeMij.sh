@@ -61,6 +61,7 @@ else
     echo "#SBATCH --requeue"   >> $out 
     echo "#SBATCH -c ${cores}"          >> $out 
     echo "#SBATCH --mem ${mem}"         >> $out 
+    echo "#SBATCH -t 7-00:00"         >> $out 
     #echo "#SBATCH --array=${minind}-${maxind}:${stepind}"         >> $out 
     #echo "#SBATCH --array=${begin}-${end}:${step}"         >> $out 
     echo "#SBATCH --array=1-${maxslurmind}"         >> $out 
@@ -83,9 +84,11 @@ else
     #echo 'ind=$(python3 -c "print(' '(${SLURM_ARRAY_TASK_ID} -1)' "* $numpert + 1)\")" >> $out 
     echo 'ind=$(python3 -c "print(int($kind + ($tind-1)*'$numpert'))")' >> $out 
 
+    echo 'sleep $SLURM_ARRAY_TASK_ID' >> $out
+
 
     echo "singularity exec \\
-                 --fusemount \"container:sshfs godot3:/localdisk/.fstein" '$mntpoint'\" "\\
+                 --fusemount \"container:sshfs -o reconnect godot2:/localdisk/.fstein" '$mntpoint'\" "\\
                  --bind" '$scratch':'$scratch' "\\
                 "'$container' '$driverMij' $N $d $truncation $x  $mg $l0 $dt0 \"$dts\" $timestep $order $cutoff '$mntpoint' '${ind}' >> $out
 

@@ -46,6 +46,7 @@ else
     echo "#SBATCH --requeue"   >> $out 
     echo "#SBATCH -c ${cores}"          >> $out 
     echo "#SBATCH --mem ${mem}"         >> $out 
+    echo "#SBATCH -t 7-00:00"         >> $out 
 
     echo " " >> $out 
     #echo container=\''singularity exec --fusemount "container:sshfs godot3:/localdisk/.fstein /data/fstein/mnt" --bind /data/fstein:/data/fstein /data/fstein/builds/ITensor-julia-wo.sif'\' >> $out

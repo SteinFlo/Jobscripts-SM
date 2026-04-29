@@ -2,10 +2,10 @@
 
 Fijscript="/data/fstein/drivers/run_Fij_MPO.jl"
 
-if [ "$#" -ne 14 ]; then
+if [ "$#" -ne 15 ]; then
     echo "Number of parameters given: "$# ", needs 14." 
     echo "Usage:" 
-    echo "makeFij_test.sh N d truncation x m/g l0 dt k1 kstep k2 order cutoff cores mem"
+    echo "makeFij_test.sh N d truncation x m/g l0 dt k1 kstep k2 order cutoff cores mem fac"
 else
     N=$1
     d=$2
@@ -33,10 +33,11 @@ else
 
     cores=${13}
     mem=${14}
+    fac=${15}
 
     timestamp=$(date +%F_%T)
 
-    out="/data/fstein/slurmscripts/Fij/Fij-N${N}_d${dimsymb}_x${x}_mg${mg}_l0${l0}_dt${dt}_k${ki1}-${kstep}-${ki2}_ord${order}_cut${cutoff}_${timestamp}.sh"
+    out="/data/fstein/slurmscripts/Fij/Fij-N${N}_d${dimsymb}_x${x}_mg${mg}_l0${l0}_dt${dt}_k${ki1}-${kstep}-${ki2}_fac${fac}_ord${order}_cut${cutoff}_${timestamp}.sh"
 
 
 
@@ -65,13 +66,13 @@ else
 
     echo 'k=${SLURM_ARRAY_TASK_ID}' >> $out
 
-    echo 'k0=$(python3 -c "print(2*$k)")' >> $out 
+    echo 'k0=$(python3 -c "print(int('${fac}'*$k))")' >> $out 
     echo 't=$(python3 -c "print('$dt'*$k)")' >> $out
 
     #echo -n "$container" $Fijscript $N $d $truncation $x  $mg $l0 '$t' '$k0' '$k' $order $cutoff >> $out
 
     echo "singularity exec \\
-                 --fusemount \"container:sshfs -o reconnect godot2:/localdisk/.fstein" '$mntpoint'\" "\\
+                 --fusemount \"container:sshfs -o reconnect godot3:/localdisk/.fstein" '$mntpoint'\" "\\
                  --bind" '$scratch':'$scratch' "\\
                 "'$container' '$driverFij' $N $d $truncation $x  $mg $l0 '$t' '$k0' '$k' $order $cutoff '$mntpoint' >> $out
 

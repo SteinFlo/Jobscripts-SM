@@ -46,6 +46,7 @@ else
     echo "#SBATCH --requeue"            >> $out 
     echo "#SBATCH -c ${cores}"          >> $out 
     echo "#SBATCH --mem ${mem}"         >> $out 
+    echo "#SBATCH -t 7-00:00"         >> $out 
     echo " " >> $out 
 
     echo 'scratch=/scr/$SLURM_JOB_ID'   >> $out
@@ -64,13 +65,13 @@ else
     echo " " >> $out
 
     echo -n "singularity exec \\
-             --fusemount \"container:sshfs godot3:/localdisk/.fstein" '$mntpoint'\" "\\
+             --fusemount \"container:sshfs -o reconnect godot3:/localdisk/.fstein" '$mntpoint'\" "\\
              --bind" '$scratch':'$scratch' "\\
             "'$container' '$driverGS' "$mg $l0 $x $N $dimsymb" '$mntpoint' >> $out
     for k in $(seq $k1 $kstep $k2); do
         echo " && \\" >> $out 
         echo -n "singularity exec \\
-                 --fusemount \"container:sshfs godot3:/localdisk/.fstein" '$mntpoint'\" "\\
+                 --fusemount \"container:sshfs -o reconnect godot3:/localdisk/.fstein" '$mntpoint'\" "\\
                  --bind" '$scratch':'$scratch' "\\
                 "'$container' '$driverTE' "$N $d $truncation $x  $mg $l0 $N1 $N2 $dt $k $order $cutoff" '$mntpoint' >> $out
     done
