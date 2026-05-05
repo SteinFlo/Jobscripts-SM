@@ -1,7 +1,7 @@
 #!/opt/julia-1.12.3/bin/julia
 include("/nethome/fstein/repositories/schwingermodeltn/src/timeEvolution/Multiproduct.jl")
 
-if length(ARGS) == 13
+if length(ARGS) == 14 || length(ARGS) == 13
 
     N         = parse(Int64,   ARGS[1])
     dimension = parse(Int64,   ARGS[2])
@@ -23,6 +23,11 @@ if length(ARGS) == 13
     cutoff    = parse(Float64, ARGS[11])
     basedir   = ARGS[12]
     counter   = parse(Int64,   ARGS[13])
+    if length(ARGS) == 14
+        maxDim   = parse(Int64,   ARGS[14])
+    else
+        maxDim = 2500
+    end
 
     numk = length(ks)
 
@@ -49,7 +54,7 @@ if length(ARGS) == 13
         outputname = string(dirname, "out/Fij/", "N", N, "_d", dimension, truncstr, "_x", x, "_mg", mg, "_l0", l0, "_t", t, "_ki", k0, "_kj", ks[counter2], "_order", order, "_cutoff", cutoff, ".out")
         open(outputname, "w") do file
             redirect_stdout(file) do
-                get_Fij_MPO(t, k0, ks[counter2], s, x, mg, l0, trunc, dirname, cutoff=cutoff, order=order)
+                get_Fij_MPO(t, k0, ks[counter2], s, x, mg, l0, trunc, dirname, cutoff=cutoff, order=order, maxDim=maxDim)
             end
         end
     else
@@ -62,12 +67,12 @@ if length(ARGS) == 13
             outputname = string(dirname, "out/Fij/", "N", N, "_d", dimension, truncstr, "_x", x, "_mg", mg, "_l0", l0, "_t", t, "_ki", ks[i], "_kj", ks[j], "_order", order, "_cutoff", cutoff, ".out")
             open(outputname, "w") do file
                 redirect_stdout(file) do
-                    get_Fij_MPO(t, ks[i], ks[j], s, x, mg, l0, trunc, dirname, cutoff=cutoff, order=order)
+                    get_Fij_MPO(t, ks[i], ks[j], s, x, mg, l0, trunc, dirname, cutoff=cutoff, order=order, maxDim=maxDim)
                 end
             end
         end
     end
 else
     println("Wrong number of arguments. Usage:")
-    println("run_Mij.jl N d truncation x mg l0 dt0 [dts] timestep order cutoff basedir counter")
+    println("run_Mij.jl N d truncation x mg l0 dt0 [dts] timestep order cutoff basedir counter maxDim")
 end

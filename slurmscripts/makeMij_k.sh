@@ -2,10 +2,10 @@
 
 Mijscript="/data/fstein/drivers/run_Mij_k.jl"
 
-if [ "$#" -ne 16 ]; then
-    echo "Number of parameters given: "$# ", needs 14." 
+if [ "$#" -ne 17 ]; then
+    echo "Number of parameters given: "$# ", needs 17." 
     echo "Usage:" 
-    echo "makeMij.sh N d truncation x m/g l0 dt0 ks timestep begin step end order cutoff cores mem"
+    echo "makeMij.sh N d truncation x m/g l0 dt0 ks timestep begin step end order cutoff cores mem maxDim"
 else
     N=$1
     d=$2
@@ -36,6 +36,7 @@ else
 
     cores=${15}
     mem=${16}
+    maxDim=${17}
 
     timestamp=$(date +%F_%T)
 
@@ -43,7 +44,7 @@ else
     kstr="${kstr//\]/}"
     kstr="${kstr//\[/}"
 
-    out="/data/fstein/slurmscripts/Mij_k/Mij_k-N${N}_d${dimsymb}_x${x}_mg${mg}_l0${l0}_dt0${dt0}_k_${kstr}_step${timestep}_it${begin}-${step}-${end}_ord${order}_cut${cutoff}_${timestamp}.sh"
+    out="/data/fstein/slurmscripts/Mij_k/Mij_k-N${N}_d${dimsymb}_x${x}_mg${mg}_l0${l0}_dt0${dt0}_k_${kstr}_step${timestep}_it${begin}-${step}-${end}_ord${order}_cut${cutoff}_MD${maxDim}_${timestamp}.sh"
     echo $out
 
     numk=$(echo $ks | awk -F, '{print NF}')
@@ -58,7 +59,7 @@ else
 
     echo "#!/bin/bash"                  >> $out 
     echo "#SBATCH --partition=physics"   >> $out 
-    echo "#SBATCH -w gothmog"   >> $out 
+#    echo "#SBATCH -w gothmog"   >> $out 
     echo "#SBATCH --requeue"   >> $out 
     echo "#SBATCH -c ${cores}"          >> $out 
     echo "#SBATCH --mem ${mem}"         >> $out 
@@ -91,7 +92,7 @@ else
     echo "singularity exec \\
                  --fusemount \"container:sshfs -o reconnect godot2:/localdisk/.fstein" '$mntpoint'\" "\\
                  --bind" '$scratch':'$scratch' "\\
-                "'$container' '$driverMij' $N $d $truncation $x  $mg $l0 $dt0 \"$ks\" $timestep $order $cutoff '$mntpoint' '${ind}' >> $out
+                "'$container' '$driverMij' $N $d $truncation $x  $mg $l0 $dt0 \"$ks\" $timestep $order $cutoff '$mntpoint' '${ind}' $maxDim >> $out
 
     echo 'rm -rf $scratch' >> $out
 
