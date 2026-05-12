@@ -1,12 +1,12 @@
 #!/bin/bash
 
-TEscript="/data/fstein/drivers/run_FermiStrTE_k.jl"
+TEscript="/data/fstein/drivers/run_SSBTE_k_loop.jl"
 GSscript="/data/fstein/drivers/run_DMRG_GS.sh"
 
-if [ "$#" -ne 16 ]; then
-    echo "Number of parameters given: "$# ", needs 16." 
+if [ "$#" -ne 17 ]; then
+    echo "Number of parameters given: "$# ", needs 17." 
     echo "Usage:" 
-    echo "makeFermiSrgSS.sh N d truncation x m/g l0 N1 N2 k t1 tstep t2 order cutoff cores mem"
+    echo "makeStringSS.sh N d truncation x m/g l0 N1 N2 Q k t1 tstep t2 order cutoff cores mem"
 else
     N=$1
     d=$2
@@ -25,19 +25,20 @@ else
     l0=$6
     N1=$7
     N2=$8
-    k=$9
-    t1=${10}
-    tstep=${11}
-    t2=${12}
-    order=${13}
-    cutoff=${14}
+    Q=$9
+    k=${10}
+    t1=${11}
+    tstep=${12}
+    t2=${13}
+    order=${14}
+    cutoff=${15}
 
-    cores=${15}
-    mem=${16}
+    cores=${16}
+    mem=${17}
 
     timestamp=$(date +%F_%T)
 
-    out="/data/fstein/slurmscripts/FermiStrTE_k/F-N${N}_d${dimsymb}_x${x}_mg${mg}_l0${l0}_N1-${N1}_N2-${N2}_k${k}_t${t1}-${tstep}-${t2}_ord${order}_cut${cutoff}_${timestamp}.sh"
+    out="/data/fstein/slurmscripts/SSBStrTE_k/S-N${N}_d${dimsymb}_x${x}_mg${mg}_l0${l0}_N1-${N1}_N2-${N2}_Q${Q}_k${k}_t${t1}-${tstep}-${t2}_ord${order}_cut${cutoff}_${timestamp}.sh"
 
 
 
@@ -65,17 +66,14 @@ else
     echo " " >> $out
 
     echo -n "singularity exec \\
-             --fusemount \"container:sshfs godot2:/localdisk/.fstein" '$mntpoint'\" "\\
+             --fusemount \"container:sshfs -o reconnect godot2:/localdisk/.fstein" '$mntpoint'\" "\\
              --bind" '$scratch':'$scratch' "\\
             "'$container' '$driverGS' "$mg $l0 $x $N $dimsymb" '$mntpoint' >> $out
-    for t in $(seq $t1 $tstep $t2); do
-        echo " && \\" >> $out 
-        echo -n "singularity exec \\
-                 --fusemount \"container:sshfs -o reconnect godot2:/localdisk/.fstein" '$mntpoint'\" "\\
-                 --bind" '$scratch':'$scratch' "\\
-                "'$container' '$driverTE' "$N $d $truncation $x  $mg $l0 $N1 $N2 $t $k $order $cutoff" '$mntpoint' >> $out
-    done
-    
+    echo " && \\" >> $out 
+    echo -n "singularity exec \\
+             --fusemount \"container:sshfs -o reconnect godot2:/localdisk/.fstein" '$mntpoint'\" "\\
+             --bind" '$scratch':'$scratch' "\\
+            "'$container' '$driverTE' "$N $d $truncation $x  $mg $l0 $N1 $N2 $t1 $tstep $t2 $k $order $cutoff" '$mntpoint' $Q  >> $out
     echo " " >> $out
     echo " " >> $out
     echo 'rm -rf $scratch' >> $out

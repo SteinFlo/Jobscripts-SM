@@ -1,6 +1,6 @@
 #!/bin/bash
 
-TEscript="/data/fstein/drivers/run_FermiStrTE_k.jl"
+TEscript="/data/fstein/drivers/run_FermiStrTE_k_loop.jl"
 GSscript="/data/fstein/drivers/run_DMRG_GS.sh"
 
 if [ "$#" -ne 16 ]; then
@@ -68,13 +68,11 @@ else
              --fusemount \"container:sshfs godot2:/localdisk/.fstein" '$mntpoint'\" "\\
              --bind" '$scratch':'$scratch' "\\
             "'$container' '$driverGS' "$mg $l0 $x $N $dimsymb" '$mntpoint' >> $out
-    for t in $(seq $t1 $tstep $t2); do
-        echo " && \\" >> $out 
-        echo -n "singularity exec \\
+    echo " && \\" >> $out 
+    echo -n "singularity exec \\
                  --fusemount \"container:sshfs -o reconnect godot2:/localdisk/.fstein" '$mntpoint'\" "\\
                  --bind" '$scratch':'$scratch' "\\
-                "'$container' '$driverTE' "$N $d $truncation $x  $mg $l0 $N1 $N2 $t $k $order $cutoff" '$mntpoint' >> $out
-    done
+                "'$container' '$driverTE' "$N $d $truncation $x  $mg $l0 $N1 $N2 $t1 $tstep $t2 $k $order $cutoff" '$mntpoint' >> $out
     
     echo " " >> $out
     echo " " >> $out
