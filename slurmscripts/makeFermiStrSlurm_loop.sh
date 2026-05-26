@@ -64,13 +64,15 @@ else
     echo 'cp /data/fstein/builds/ITensor-julia-wo.sif $container' >> $out
     echo " " >> $out
 
+    echo "echo $out" >> $out
+
     echo -n "singularity exec \\
-             --fusemount \"container:sshfs godot3:/localdisk/.fstein" '$mntpoint'\" "\\
+             --fusemount \"container:sshfs godot2:/localdisk/.fstein" '$mntpoint'\" "\\
              --bind" '$scratch':'$scratch' "\\
             "'$container' '$driverGS' "$mg $l0 $x $N $dimsymb" '$mntpoint' >> $out
     echo " && \\" >> $out 
     echo -n "singularity exec \\
-             --fusemount \"container:sshfs -o reconnect godot3:/localdisk/.fstein" '$mntpoint'\" "\\
+             --fusemount \"container:sshfs -o reconnect godot2:/localdisk/.fstein" '$mntpoint'\" "\\
              --bind" '$scratch':'$scratch' "\\
             "'$container' '$driverTE' "$N $d $truncation $x  $mg $l0 $N1 $N2 $dt $t1 $tstep $t2 $order $cutoff" '$mntpoint' >> $out
 
