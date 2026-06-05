@@ -32,8 +32,8 @@ if length(ARGS) == 14
 
     outputname = string(dirname, "out/single/", "N", N, "_d", dimension, truncstr, "_X", x, "_mg", mg, "_l0", l0, "_N1-", N1, "_dt", dt, "_t", t1,"-", ts, "-", t2, "_order", order, "_cutoff", cutoff, ".out")
 
-    #open(outputname, "w") do file
-    #    redirect_stdout(file) do
+    open(outputname, "w") do file
+        redirect_stdout(file) do
             fname_gs = string(dirDMRG, "gs", "_renormPBC", "_N", N, "_d", dimension, truncstr, "_x", x, "_mg", mg, "_l0", l0, "_Dmax", 400,     ".jld2")
             f = jldopen(fname_gs, "r")
             s = f["sites"]
@@ -47,7 +47,7 @@ if length(ARGS) == 14
                 S=op("S-", s[2*N1-1])
             end
 
-            psiStr = apply(S ,psi0)
+            psiStr = normalize(apply(S ,psi0))
             println("Initialized Fermion")
 
             for t in t1:ts:t2
@@ -55,8 +55,8 @@ if length(ARGS) == 14
                 runTestEvo(N, dimension, x, mg, l0, epsilon, trunc, dt, k, psiStr, s, dirname, psiname=psiname, cutoff=cutoff, order=order, diststr=diststr)
                 flush(stdout)
             end
-     #   end
-    #end
+        end
+    end
 else
     println("Wrong number of arguments. Usage:")
         println("run_FermiStrTE_loop.jl N d truncation x m/g l0 N1 N2 dt t1 ts t2  order cutoff basedir")
