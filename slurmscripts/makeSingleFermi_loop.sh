@@ -36,7 +36,7 @@ else
 
     timestamp=$(date +%F_%T)
 
-    out="/data/fstein/slurmscripts/Fermiloop/F-N${N}_d${dimsymb}_x${x}_mg${mg}_l0${l0}_N1-${N1}_dt${dt}_t${t1}-${tstep}-${t2}_ord${order}_cut${cutoff}_${timestamp}.sh"
+    out="/data/fstein/slurmscripts/singlefermi/SF-N${N}_d${dimsymb}_x${x}_mg${mg}_l0${l0}_N1-${N1}_dt${dt}_t${t1}-${tstep}-${t2}_ord${order}_cut${cutoff}_${timestamp}.sh"
 
 
 
