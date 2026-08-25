@@ -3,7 +3,7 @@
 Mijscript="/data/fstein/drivers/run_Mij.jl"
 
 if [ "$#" -ne 16 ]; then
-    echo "Number of parameters given: "$# ", needs 14." 
+    echo "Number of parameters given: "$# ", needs 16." 
     echo "Usage:" 
     echo "makeMij.sh N d truncation x m/g l0 dt0 dts timestep begin step end order cutoff cores mem"
 else
